@@ -1,10 +1,7 @@
 langchain==0.3.26
 flask==3.1.1
-sentense-transformers==4.1.0
-pypdf2==5.6.1
+sentence-transformers==4.1.0
+pypdf2==3.0.1
 python-dotenv==1.1.0
 langchain-openai==0.3.24
-langchain-communit==0.3.26
-langchain-openai==0.3.24
-
-- e.
+langchain-community==0.3.26
