@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedRAG Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="chat-card">
+      <header>
+        <h1>MedRAG</h1>
+        <p>Minimal medical retrieval assistant</p>
+      </header>
+
+      <div id="chat-log" class="chat-log" aria-live="polite">
+        <div class="msg assistant">Ask a medical question to start.</div>
+      </div>
+
+      <form id="chat-form" class="chat-form">
+        <input id="message-input" type="text" placeholder="Type your question..." required />
+        <button type="submit">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const chatLog = document.getElementById("chat-log");
+    const form = document.getElementById("chat-form");
+    const messageInput = document.getElementById("message-input");
+
+    function addMessage(text, role) {
+      const line = document.createElement("div");
+      line.className = `msg ${role}`;
+      line.textContent = text;
+      chatLog.appendChild(line);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      messageInput.value = "";
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          addMessage(data.error || "Request failed.", "assistant");
+          return;
+        }
+
+        addMessage(data.answer || "No answer received.", "assistant");
+      } catch (error) {
+        addMessage("Network error. Please try again.", "assistant");
+      }
+    });
+  </script>
+</body>
+</html>
